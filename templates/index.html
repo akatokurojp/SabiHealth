@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Chatbot</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <link rel="stylesheet" type="text/css" href="/static/css/style.css">
+</head>
+<body>
+    <h1>Sabi Health Assistant</h1>
+
+    <div id="chat-container">
+        <div id="chat-log"></div>
+        <div id="user-input">
+            <input type="text" id="user-query" placeholder="Type your message here" />
+            <button id="send-btn">Send</button>
+            <button id="analyze-btn">Analyze</button>
+        </div>
+    </div>
+
+    <div id="analysis-container">
+        <h2>Analysis</h2>
+        <div id="analysis-log"></div>
+    </div>
+
+    <script>
+        $(document).ready(function() {
+            $('#send-btn').click(function() {
+                var userQuery = $('#user-query').val();
+                if (userQuery !== '') {
+                    $('#user-query').val('');
+                    appendMessage('user', userQuery);
+                    sendUserQuery(userQuery);
+                }
+            });
+
+            $('#analyze-btn').click(function() {
+                var botResponse = $('.bot-message').last().text();
+                analyzeBotResponse(botResponse);
+            });
+
+            $('#user-query').keypress(function(e) {
+                if (e.which === 13) {
+                    $('#send-btn').click();
+                }
+            });
+
+            function appendMessage(sender, message) {
+                var chatLog = $('#chat-log');
+                var senderClass = sender === 'user' ? 'user-message' : 'bot-message';
+                chatLog.append('<div class="' + senderClass + '">' + message + '</div>');
+                chatLog.scrollTop(chatLog.prop('scrollHeight'));
+            }
+
+            function sendUserQuery(userQuery) {
+                appendMessage('user', userQuery);
+
+                $.ajax({
+                    type: 'POST',
+                    url: '/chat',
+                    data: { user_query: userQuery },
+                    success: function(response) {
+                        appendMessage('bot', response.response);
+                    },
+                    error: function() {
+                        appendMessage('bot', "Sorry, an error occurred.");
+                    }
+                });
+            }
+
+            function analyzeBotResponse(botResponse) {
+                $.ajax({
+                    type: 'POST',
+                    url: '/analyze',
+                    data: { bot_response: botResponse },
+                    success: function(response) {
+                        displayAnalysis(response.analysis);
+                    },
+                    error: function() {
+                        displayAnalysis("Sorry, an error occurred during analysis.");
+                    }
+                });
+            }
+
+            function displayAnalysis(analysis) {
+                var analysisLog = $('#analysis-log');
+                analysisLog.empty();
+
+                for (var title in analysis) {
+                    analysisLog.append('<h3>' + title + ':</h3>');
+                    analysisLog.append('<p>' + analysis[title] + '</p>');
+                }
+
+                $('#analysis-container').show();
+            }
+        });
+    </script>
+</body>
+</html>
