@@ -68,12 +68,12 @@ class ChatBot:
     def get_self_healing_methods(self, user_query):
         symptoms = [token.text for token in self.nlp(user_query) if token.pos_ == "NOUN"]
         self_healing_methods = {
-            "tinnitus": [
-                "Avoid loud noises and use ear protection when necessary.",
-                "Manage stress levels through relaxation techniques.",
-                "Try background noise or soothing music to mask the tinnitus.",
-                "Avoid caffeine and nicotine, as they can worsen tinnitus.",
-                "Consult a healthcare professional for further evaluation and treatment."
+            "congestion": [
+                "You need to gargle warm saltwater."
+                "You need to drink warm liquids like tea or soup."
+                "You need to suck throat lozenges."
+                "You need to avoid irritants like smoke or dry air."
+                "You need to get plenty of rest."
             ],
             "otitis media": [
                 "Keep the ear dry and avoid water exposure.",
